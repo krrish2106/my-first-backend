@@ -1,4 +1,5 @@
 require('dotenv').config()
+const rateLimit = require('express-rate-limit')
 
 const mongoose = require('mongoose')
 
@@ -7,10 +8,32 @@ mongoose.connect(process.env.MONGO_URL)
   .catch((err) => console.log('Error connecting:', err))
 
 const User = require('./models/User')
-
+const helmet = require('helmet')
 const express = require('express')
 const app = express()
 app.use(express.json())
+
+app.use(helmet())
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    error: 'Too many requests. Please try again after 15 minutes.'
+  }
+})
+
+app.use(limiter)
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: {
+    error: 'Too many login attempts. Please try again after 15 minutes.'
+  }
+})
+
+app.use('/auth/login', authLimiter)
 
 app.use((req, res, next) => {
   console.log(`${req.method} request to ${req.url}`)
