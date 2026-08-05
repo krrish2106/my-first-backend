@@ -1,4 +1,5 @@
 require('dotenv').config()
+const cors = require('cors')
 const rateLimit = require('express-rate-limit')
 
 const mongoose = require('mongoose')
@@ -14,6 +15,12 @@ const app = express()
 app.use(express.json())
 
 app.use(helmet())
+
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://my-first-backend-production-ceb8.up.railway.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'authorization']
+}))
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
