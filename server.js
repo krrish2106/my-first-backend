@@ -12,6 +12,7 @@ const User = require('./models/User')
 const helmet = require('helmet')
 const express = require('express')
 const app = express()
+
 app.use(express.json())
 
 app.use(helmet())

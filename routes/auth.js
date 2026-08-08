@@ -1,13 +1,24 @@
+const Joi = require('joi')
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 
+const signupSchema = Joi.object({
+  name: Joi.string().min(2).max(50).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).max(30).required()
+})
+
 // SIGNUP
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password } = req.body
+    const { error } = signupSchema.validate({ name, email, password })
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message })
+    }
 
     // Validation
     if (!name || !email || !password) {
