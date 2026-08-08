@@ -11,7 +11,10 @@ const app = express()
 // Connect to database
 connectDB()
 
-// Middleware
+const startCronJobs = require('./services/cronService')
+startCronJobs()
+
+// Middleware first — always before routes
 app.use(helmet())
 app.use(cors({
   origin: ['http://localhost:3000', 'https://my-first-backend-production-ceb8.up.railway.app'],
@@ -31,12 +34,14 @@ app.use((req, res, next) => {
   next()
 })
 
-// Routes
+// Routes — always after middleware
 const authRoutes = require('./routes/auth')
 const userRoutes = require('./routes/users')
+const webhookRoutes = require('./routes/webhooks')
 
 app.use('/auth', authRoutes)
 app.use('/users', userRoutes)
+app.use('/webhooks', webhookRoutes)
 
 // Root
 app.get('/', (req, res) => {
